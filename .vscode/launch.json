@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args":["--filename","C:\\Users\\pfran\\Downloads\\.vsCode\\Sirius_3_Other_20250524_UTF8.sie","--output","C:\\Users\\pfran\\OneDrive\\Dokument\\pfsie.csv","--encoding","windows-1252"]
+        }
+    ]
+}
