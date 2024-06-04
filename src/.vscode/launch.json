@@ -11,7 +11,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args":["--filename","Sirius_3_Other_20250524_UTF8.sie","--output","C:\\Users\\pfran\\OneDrive\\Dokument\\pfsie2.csv","--encoding","utf-8"]
+            "args":["--folderpath","C:\\Users\\pfran\\Downloads\\Downloads","--output","C:\\Users\\pfran\\OneDrive\\Dokument\\pfsie2.csv","--encoding","utf-8"]
         }
     ]
 }

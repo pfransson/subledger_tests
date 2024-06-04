@@ -4,7 +4,8 @@
 import argparse
 import shlex
 import datetime
-import ExcelReader
+from ExcelReader import ExcelReader
+import FileFinder
 
 
 def main():
@@ -45,9 +46,9 @@ def main():
     if output_file:
         output_file.write('"' + '","'.join(data[0]) + '"\n')
 
-    
-    
-    for inputfile in args.filename:
+    sieFiles = FileFinder.FileFinder.get_files(args.folderpath[0], 'sie')
+
+    for inputfile in sieFiles:
         attribute_fnamn = "Okänd"
         attribute_gen = ""
         attribute_valuta = "SEK"
@@ -164,7 +165,12 @@ def main():
             #print "Updating sheet..."
             wks.update_cells(cell_list)
 
-        """
+    testDataSet = ExcelReader.get_first_sheet_data('C:\\Users\\pfran\\Downloads\\Downloads\\Extract_20240522.xlsx')
+    summary = testDataSet.groupby(['mutualcode', 'trans_createtime', 'AccountNumber']).agg({ \
+    'debitAmount': 'sum','creditAmount': 'sum'}).reset_index()
+    print("test")
+
+    """
         for row_nbr, rowdata in enumerate(data):
             print "row %d" % row_nbr
             for col_nbr, coldata in enumerate(rowdata):
