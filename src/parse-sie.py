@@ -4,11 +4,12 @@
 import argparse
 import shlex
 import datetime
+import ExcelReader
 
 
 def main():
     parser = argparse.ArgumentParser(description='Parse SIE file format')
-    parser.add_argument('--filename', required=True, nargs='+')
+    parser.add_argument('--folderpath', required=True, nargs='+')
     parser.add_argument('--encoding', default='cp850',
                         choices=['cp850', 'latin-1', 'utf-8', 'windows-1252'])
     parser.add_argument('--output', required=False, help='Output CSV filename')
@@ -30,6 +31,7 @@ def main():
         '8': '8 - Finansiella och andra inkomster/intäkter och utgifter/kostnader'
     }
 
+
     output_file = None
     if args.output:
         output_file = open(args.output, 'w')
@@ -42,6 +44,8 @@ def main():
         print('"' + '","'.join(data[0]) + '"')
     if output_file:
         output_file.write('"' + '","'.join(data[0]) + '"\n')
+
+    
     
     for inputfile in args.filename:
         attribute_fnamn = "Okänd"
