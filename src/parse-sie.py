@@ -13,7 +13,7 @@ def main():
     parser.add_argument('--folderpath', required=True, nargs='+')
     parser.add_argument('--encoding', default='cp850',
                         choices=['cp850', 'latin-1', 'utf-8', 'windows-1252'])
-    parser.add_argument('--output', required=False, help='Output CSV filename')
+    parser.add_argument('--outputfolder', required=False, help='Output folder')
     parser.add_argument('--debug', action='store_true', default=False,
                         help='Display more debug')
     parser.add_argument('--googlesheets', required=False,
@@ -34,8 +34,7 @@ def main():
 
 
     output_file = None
-    if args.output:
-        output_file = open(args.output, 'w')
+
     data = list()
     data.append(list(["Date", "DateMonth", "Account", "Account group",
                       "Account name", "Kst", "Proj", "Amount", "Text",
@@ -43,8 +42,8 @@ def main():
 
     if args.debug:
         print('"' + '","'.join(data[0]) + '"')
-    if output_file:
-        output_file.write('"' + '","'.join(data[0]) + '"\n')
+
+
 
     sieFiles = FileFinder.FileFinder.get_files(args.folderpath[0], 'sie')
 
@@ -95,43 +94,45 @@ def main():
                 verifications.extend(vers)
         
         # print "Resultat '%s' gen: %s: " % (attribute_fnamn, attribute_gen)
-    
-        for ver in verifications:
-            account_name = ""
-            proj_name = ver["proj_nr"]
-            kst_name = ver["kst"]
-            if ver["account"] in attribute_accounts:
-                account_name = attribute_accounts[ver["account"]]
-            if ver["kst"] in attribute_kst:
-                kst_name = attribute_kst[ver["kst"]]
-            if ver["proj_nr"] in attribute_proj:
-                proj_name = attribute_proj[ver["proj_nr"]]
+        if args.outputfolder:
+            output_file = open(args.outputfolder + 'output' + FileFinder.FileFinder.get_filename(inputfile) + '.csv', 'w')
+            output_file.write('' + ','.join(data[0]) + '\n')
+            for ver in verifications:
+                account_name = ""
+                proj_name = ver["proj_nr"]
+                kst_name = ver["kst"]
+                if ver["account"] in attribute_accounts:
+                    account_name = attribute_accounts[ver["account"]]
+                if ver["kst"] in attribute_kst:
+                    kst_name = attribute_kst[ver["kst"]]
+                if ver["proj_nr"] in attribute_proj:
+                    proj_name = attribute_proj[ver["proj_nr"]]
 
-            cols = list()
-            cols.append("%s-%s-%s" % (ver["verdate"][0:4], ver["verdate"][4:6], ver["verdate"][6:8]))
-            cols.append("%s-%s" % (ver["verdate"][0:4], ver["verdate"][4:6]))
-            cols.append("%s" % ver["account"])
-            if ver["account"][0] in account_group:
-                cols.append("%s" % account_group[ver["account"][0]])
-            else:
-                cols.append("")
-            cols.append("%s" % account_name)
-            cols.append("%s" % kst_name)
-            cols.append("%s" % proj_name)
-            cols.append("%0.0f" % float(ver["amount"]))
-            cols.append("%s" % ver["vertext"])
-            cols.append("%s" % ver["verno"])
-            cols.append("%s" % datetime.datetime.strptime(cols[0], "%Y-%m-%d"))
-            cols.append("%s" % attribute_fnamn)
-            if args.debug:
-                print('"' + '","'.join(cols) + '"')
-            if output_file:
-                output_file.write('"' + '","'.join(cols) + '"\n')
+                cols = list()
+                cols.append("%s-%s-%s" % (ver["verdate"][0:4], ver["verdate"][4:6], ver["verdate"][6:8]))
+                cols.append("%s-%s" % (ver["verdate"][0:4], ver["verdate"][4:6]))
+                cols.append("%s" % ver["account"])
+                if ver["account"][0] in account_group:
+                    cols.append("%s" % account_group[ver["account"][0]])
+                else:
+                    cols.append("")
+                cols.append("%s" % account_name)
+                cols.append("%s" % kst_name)
+                cols.append("%s" % proj_name)
+                cols.append("%0.0f" % float(ver["amount"]))
+                cols.append("%s" % ver["vertext"])
+                cols.append("%s" % ver["verno"])
+                cols.append("%s" % datetime.datetime.strptime(cols[0], "%Y-%m-%d"))
+                cols.append("%s" % attribute_fnamn)
+                if args.debug:
+                    print('"' + '","'.join(cols) + '"')
+                data.append(cols)
+                output_file.write('' + ','.join(cols) + '\n')
 
-            data.append(cols)
 
-    if output_file:
-        output_file.close()
+            output_file.close()
+        else:
+            raise Exception("No output folder specified")
 
     if args.googlesheets:
         import gspread
@@ -166,7 +167,7 @@ def main():
             wks.update_cells(cell_list)
 
     testDataSet = ExcelReader.get_first_sheet_data('C:\\Users\\pfran\\Downloads\\Downloads\\Extract_20240522.xlsx')
-    summary = testDataSet.groupby(['mutualcode', 'trans_createtime', 'AccountNumber']).agg({ \
+    summary = testDataSet.groupby(['mutualcode', 'GLbookingDate', 'AccountNumber']).agg({ \
     'debitAmount': 'sum','creditAmount': 'sum'}).reset_index()
     print("test")
 
