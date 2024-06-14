@@ -18,7 +18,7 @@ def main():
                         help='Display more debug')
     parser.add_argument('--googlesheets', required=False,
                         help='Name of Google Sheets to create. Need creds.json. Note that the spreadsheet must exists and the content may be overwritten.')
-
+    #Add argument for mapping file
     args = parser.parse_args()
 
     account_group = {
@@ -134,37 +134,7 @@ def main():
         else:
             raise Exception("No output folder specified")
 
-    if args.googlesheets:
-        import gspread
-        from oauth2client.service_account import ServiceAccountCredentials
-        nbr_rows = len(data)
-        nbr_cols = len(data[0])
-        print("Google Sheet: " + args.googlesheets)
-        scope = ['https://spreadsheets.google.com/feeds']
-        credentials = ServiceAccountCredentials.from_json_keyfile_name('creds.json', scope)
-        gc = gspread.authorize(credentials)
-        sheet = gc.open(args.googlesheets)
-        wks = sheet.get_worksheet(0)
-       
-        print("Resizing to %d rows and %d cols... (range A1:%s%d)" % (nbr_rows, nbr_cols, chr(64 + nbr_cols), nbr_rows))
-        wks.resize(rows=nbr_rows, cols=nbr_cols)
 
-        bulk = 1000 
-        for i in range(1, nbr_rows + 1, bulk):
-            j = i + bulk - 1
-            if j > nbr_rows:
-                j = nbr_rows
-            print("Updating A%d:%s%d ..." % (i, chr(64 + nbr_cols), j))
-            cell_list = wks.range('A%d:%s%d' % (i, chr(64 + nbr_cols), j))
-
-            #print "Populating with data..."
-            for cell in cell_list:
-                if args.debug:
-                    print("getting row %d col %d: '%s'" % (cell.row - 1, cell.col - 1, data[cell.row - 1][cell.col - 1]))
-                cell.value = data[cell.row - 1][cell.col - 1].replace('å', 'a').replace('ä', 'a').replace('ö', 'o').replace('Å', 'A').replace('Ä', 'A').replace('Ö', 'O')
-    
-            #print "Updating sheet..."
-            wks.update_cells(cell_list)
 
     testDataSet = ExcelReader.get_first_sheet_data('C:\\Users\\pfran\\Downloads\\Downloads\\Extract_20240522.xlsx')
     summary = testDataSet.groupby(['mutualcode', 'GLbookingDate', 'AccountNumber']).agg({ \
