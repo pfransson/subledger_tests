@@ -32,7 +32,7 @@ def main():
         '8': '8 - Finansiella och andra inkomster/intäkter och utgifter/kostnader'
     }
 
-
+    #add code to read mapping file and generate dataframe
     output_file = None
 
     data = list()
